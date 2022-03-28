@@ -2,7 +2,6 @@ import json
 from nltk.corpus import stopwords, wordnet
 from nltk.stem import WordNetLemmatizer
 
-
 SUBGRAPH_PATTERNS = [
 
     {'pos':['V', 'N', 'NOT', 'N', 'N', 'IN'], 'dependency':['root', 'nsubj', 'advmod', 'obj', 'obl', 'case'], 'child':{0:[1, 2, 3], 3:[4], 4:[5]}}, 

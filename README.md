@@ -1,5 +1,4 @@
 # Open-vocabulary event extraction tool
-The code for event extraction from [Automatic Mining of Salient Events from Multiple Documents] and [Unsupervised Multi-Granularity Summarization](https://arxiv.org/abs/2201.12502)
 
 
 ## Overview
