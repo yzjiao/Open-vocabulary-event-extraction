@@ -1,0 +1,15 @@
+{
+    "src": [
+        "Last week, I overdrafted the account accidentally.", 
+        "A restaurant charged me too much by mistake.", 
+        "Afterward, I purchase more times so the overdraft fees further increased.", 
+        "But my bank refused to reverse more than half."
+    ], 
+    "id": 0, 
+    "event": [
+        "i overdrafted", 
+        "restaurant charge", 
+        "i purchase | fee increase", 
+        "refuse to reverse"
+    ]
+}
