@@ -40,7 +40,7 @@ def extract_event(idx):
         json.dump(cur, f, indent=4)
 
 
-def extract_event_mp():
+def extract_event():
     global data, extractor, nlp
     nlp = StanfordCoreNLP(path_to_corenlp)
     extractor = Extractor()
@@ -64,7 +64,7 @@ def extract_event_mp():
 if __name__ == '__main__':
     if not os.path.exists(output_path):
         os.makedirs(output_path)
-    extract_event_mp()
+    extract_event()
 
 
 
