@@ -12,7 +12,7 @@ from nltk import sent_tokenize
 
 input_file = 'example.json'
 output_path = 'output'
-path_to_corenlp = r'./stanford-corenlp-full-2018-10-05'
+path_to_corenlp = r'../stanford-corenlp-full-2018-10-05'
 
 
 

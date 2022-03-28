@@ -2,183 +2,158 @@ import json
 from nltk.corpus import stopwords, wordnet
 from nltk.stem import WordNetLemmatizer
 
+
 SUBGRAPH_PATTERNS = [
-
-    {'pos':['V', 'N', 'NOT', 'N', 'N', 'IN'], 'dependency':['root', 'nsubj', 'advmod', 'obj', 'obl', 'case'], 'child':{0:[1, 2, 3], 3:[4], 4:[5]}}, 
-    
-    {'pos':['V', 'N', 'N', 'N', 'IN'], 'dependency':['root', 'nsubj', 'obj', 'obl', 'case'], 'child':{0:[1, 2], 2:[3], 3:[4]}}, 
-    
-    {'pos':['V', 'NOT', 'N', 'N', 'IN'], 'dependency':['conj', 'advmod', 'obj', 'obl', 'case'], 'child':{0:[1,2], 2:[3], 3:[4]}}, 
-    
-    {'pos':['V', 'N', 'N', 'IN'], 'dependency':['conj', 'obj', 'obl', 'case'], 'child':{0:[1], 1:[2], 2:[3]}}, 
-    
-
-    {'pos':['V', 'N', 'NOT', 'N', 'N'], 'dependency':['root', 'nsubj', 'advmod', 'iobj', 'obj'], 'child':{0:[1, 2, 3, 4]}}, 
-    
-    {'pos':['V', 'N', 'N', 'N'], 'dependency':['root', 'nsubj', 'iobj', 'obj'], 'child':{0:[1, 2, 3]}}, 
-
-    {'pos':['V', 'NOT', 'N', 'N'], 'dependency':['conj', 'advmod', 'iobj', 'obj'], 'child':{0:[1, 2, 3]}}, 
-    
-    {'pos':['V', 'N', 'N'], 'dependency':['conj', 'iobj', 'obj'], 'child':{0:[1, 2]}}, 
-    
-    
-    {'pos':['JJ', 'N', 'NOT', 'V', 'N', 'TO'], 'dependency':['root', 'nsubj', 'advmod', 'xcomp', 'obj', 'mark'], 'child':{0:[1, 2, 3], 3:[4, 5]}}, 
-    
-    {'pos':['JJ', 'N', 'V', 'N', 'TO'], 'dependency':['root', 'nsubj', 'xcomp', 'obj', 'mark'], 'child':{0:[1, 2], 2:[3, 4]}}, 
-    
-    {'pos':['JJ', 'NOT', 'V', 'N', 'TO'], 'dependency':['root', 'advmod', 'xcomp', 'obj', 'mark'], 'child':{0:[1, 2], 2:[3, 4]}}, 
-    
-    {'pos':['JJ', 'V', 'N', 'TO'], 'dependency':['root', 'xcomp', 'obj', 'mark'], 'child':{0:[1], 1:[2, 3]}}, 
-
-
-    {'pos':['JJ', 'N', 'NOT', 'N', 'IN'], 'dependency':['root', 'nsubj', 'advmod', 'obl', 'case'], 'child':{0:[1, 2, 3], 3:[4]}}, 
-    
-    {'pos':['JJ', 'N', 'N', 'IN'], 'dependency':['root', 'nsubj', 'obl', 'case'], 'child':{0:[1, 2], 2:[3]}}, 
-
-    {'pos':['JJ', 'NOT', 'N', 'IN'], 'dependency':['conj', 'advmod', 'obl', 'case'], 'child':{0:[1,2], 2:[3]}}, 
-    
-    {'pos':['JJ', 'N', 'IN'], 'dependency':['conj', 'obl', 'case'], 'child':{0:[1], 1:[2]}}, 
-    
- 
     {'pos':['V', 'N', 'NOT', 'N', 'JJ', 'V', 'TO'], 'dependency':['root', 'nsubj', 'advmod', 'obj', 'xcomp', 'cop', 'mark'], 'child':{0:[1, 2, 3, 4], 4:[5], 5:[6]}}, 
     
-    {'pos':['V', 'N', 'N', 'JJ', 'V', 'TO'], 'dependency':['root', 'nsubj', 'obj', 'xcomp', 'cop', 'mark'], 'child':{0:[1, 2, 3], 3:[4], 4:[5]}}, 
-    
-    {'pos':['V', 'NOT', 'N', 'JJ', 'V', 'TO'], 'dependency':['conj', 'advmod', 'obj', 'xcomp', 'cop', 'mark'], 'child':{0:[1, 2, 3], 3:[4], 4:[5]}}, 
-    
-    {'pos':['V', 'N', 'JJ', 'V', 'TO'], 'dependency':['conj', 'obj', 'xcomp', 'cop', 'mark'], 'child':{0:[1, 2], 2:[3], 3:[4]}}, 
-
-
     {'pos':['V', 'N', 'NOT', 'N', 'N', 'V', 'TO'], 'dependency':['root', 'nsubj', 'advmod', 'obj', 'xcomp', 'cop', 'mark'], 'child':{0:[1, 2, 3, 4], 4:[5], 5:[6]}}, 
-    
-    {'pos':['V', 'N', 'N', 'N', 'V', 'TO'], 'dependency':['root', 'nsubj', 'obj', 'xcomp', 'cop', 'mark'], 'child':{0:[1,2, 3], 3:[4], 4:[5]}}, 
-
-    {'pos':['V', 'NOT', 'N', 'N', 'V', 'TO'], 'dependency':['conj', 'advmod', 'obj', 'xcomp', 'cop', 'mark'], 'child':{0:[1,2, 3], 3:[4]}}, 
-    
-    {'pos':['V', 'N', 'N', 'V', 'TO'], 'dependency':['conj', 'obj', 'xcomp', 'cop', 'mark'], 'child':{0:[1,2], 2:[3], 3:[4]}}, 
-    
     
     {'pos':['V', 'N', 'NOT', 'N', 'V', 'N', 'TO'], 'dependency':['root', 'nsubj', 'advmod', 'obj', 'xcomp', 'obj', 'mark'], 'child':{0:[1,2, 3, 4], 4:[5, 6]}}, 
     
     {'pos':['V', 'N', 'N', 'V', 'N', 'TO'], 'dependency':['root', 'nsubj', 'obj', 'xcomp', 'obj', 'mark'], 'child':{0:[1,2, 3], 3:[4, 5]}}, 
 
     {'pos':['V', 'NOT', 'N', 'V', 'N', 'TO'], 'dependency':['conj', 'advmod', 'obj', 'xcomp', 'obj', 'mark'], 'child':{0:[1,2, 3], 3:[4, 5]}}, 
-    
-    {'pos':['V', 'N', 'V', 'N', 'TO'], 'dependency':['conj', 'obj', 'xcomp', 'obj', 'mark'], 'child':{0:[1,2], 2:[3, 4]}}, 
-    
 
+    {'pos':['V', 'N', 'N', 'JJ', 'V', 'TO'], 'dependency':['root', 'nsubj', 'obj', 'xcomp', 'cop', 'mark'], 'child':{0:[1, 2, 3], 3:[4], 4:[5]}}, 
+    
+    {'pos':['V', 'NOT', 'N', 'JJ', 'V', 'TO'], 'dependency':['conj', 'advmod', 'obj', 'xcomp', 'cop', 'mark'], 'child':{0:[1, 2, 3], 3:[4], 4:[5]}}, 
+
+    {'pos':['V', 'N', 'NOT', 'N', 'N', 'IN'], 'dependency':['root', 'nsubj', 'advmod', 'obj', 'obl', 'case'], 'child':{0:[1, 2, 3], 3:[4], 4:[5]}}, 
+    
+    {'pos':['JJ', 'N', 'NOT', 'V', 'N', 'TO'], 'dependency':['root', 'nsubj', 'advmod', 'xcomp', 'obj', 'mark'], 'child':{0:[1, 2, 3], 3:[4, 5]}}, 
+
+    {'pos':['V', 'N', 'N', 'N', 'V', 'TO'], 'dependency':['root', 'nsubj', 'obj', 'xcomp', 'cop', 'mark'], 'child':{0:[1,2, 3], 3:[4], 4:[5]}}, 
+
+    {'pos':['V', 'NOT', 'N', 'N', 'V', 'TO'], 'dependency':['conj', 'advmod', 'obj', 'xcomp', 'cop', 'mark'], 'child':{0:[1,2, 3], 3:[4]}}, 
     
     {'pos':['V', 'N', 'NOT', 'N', 'N', 'IN'], 'dependency':['root', 'nsubj', 'advmod', 'obj', 'obl', 'case'], 'child':{0:[1,2, 3, 4], 4:[5]}}, 
+    
+    {'pos':['V', 'N', 'NOT', 'JJ', 'V', 'TO'], 'dependency':['root', 'nsubj', 'advmod', 'xcomp', 'cop', 'mark'], 'child':{0:[1,2,3], 3:[4], 4:[5]}}, 
+    
+    {'pos':['V', 'N', 'NOT', 'N', 'V', 'TO'], 'dependency':['root', 'nsubj', 'advmod', 'xcomp', 'cop', 'mark'], 'child':{0:[1,2,3], 3:[4], 4:[5]}}, 
+    
+    {'pos':['V', 'N', 'NOT', 'V', 'N', 'TO'], 'dependency':['root', 'nsubj', 'advmod', 'xcomp', 'obj', 'mark'], 'child':{0:[1,2,3], 3:[4, 5]}}, 
+
+    {'pos':['V', 'N', 'N', 'V', 'TO'], 'dependency':['conj', 'obj', 'xcomp', 'cop', 'mark'], 'child':{0:[1,2], 2:[3], 3:[4]}}, 
+ 
+    {'pos':['V', 'N', 'JJ', 'V', 'TO'], 'dependency':['conj', 'obj', 'xcomp', 'cop', 'mark'], 'child':{0:[1, 2], 2:[3], 3:[4]}}, 
+
+    {'pos':['V', 'N', 'N', 'N', 'IN'], 'dependency':['root', 'nsubj', 'obj', 'obl', 'case'], 'child':{0:[1, 2], 2:[3], 3:[4]}}, 
+    
+    {'pos':['V', 'NOT', 'N', 'N', 'IN'], 'dependency':['conj', 'advmod', 'obj', 'obl', 'case'], 'child':{0:[1,2], 2:[3], 3:[4]}}, 
+    
+    {'pos':['V', 'N', 'NOT', 'N', 'N'], 'dependency':['root', 'nsubj', 'advmod', 'iobj', 'obj'], 'child':{0:[1, 2, 3, 4]}}, 
+    
+    {'pos':['JJ', 'N', 'V', 'N', 'TO'], 'dependency':['root', 'nsubj', 'xcomp', 'obj', 'mark'], 'child':{0:[1, 2], 2:[3, 4]}}, 
+    
+    {'pos':['JJ', 'NOT', 'V', 'N', 'TO'], 'dependency':['root', 'advmod', 'xcomp', 'obj', 'mark'], 'child':{0:[1, 2], 2:[3, 4]}}, 
+    
+    {'pos':['JJ', 'N', 'NOT', 'N', 'IN'], 'dependency':['root', 'nsubj', 'advmod', 'obl', 'case'], 'child':{0:[1, 2, 3], 3:[4]}}, 
+
+    {'pos':['V', 'N', 'V', 'N', 'TO'], 'dependency':['root', 'nsubj', 'xcomp', 'obj', 'mark'], 'child':{0:[1,2], 2:[3, 4]}}, 
+
+    {'pos':['V', 'NOT', 'V', 'N', 'TO'], 'dependency':['conj', 'advmod', 'xcomp', 'obj', 'mark'], 'child':{0:[1,2], 2:[3, 4]}}, 
+
+    {'pos':['V', 'N', 'NOT', 'N', 'IN'], 'dependency':['root', 'nsubj:pass', 'advmod', 'obl', 'case'], 'child':{0:[1,2,3], 3:[4]}}, 
+    
+    {'pos':['V', 'N', 'NOT', 'N', 'IN'], 'dependency':['root', 'nsubj', 'advmod', 'obl', 'case'], 'child':{0:[1,2,3], 3:[4]}},
+        
+    {'pos':['V', 'N', 'V', 'N', 'TO'], 'dependency':['conj', 'obj', 'xcomp', 'obj', 'mark'], 'child':{0:[1,2], 2:[3, 4]}}, 
     
     {'pos':['V', 'N', 'N', 'N', 'IN'], 'dependency':['root', 'nsubj', 'obj', 'obl', 'case'], 'child':{0:[1,2, 3], 3:[4]}}, 
 
     {'pos':['V', 'NOT', 'N', 'N', 'IN'], 'dependency':['conj', 'advmod', 'obj', 'obl', 'case'], 'child':{0:[1,2,3], 3:[4]}}, 
     
-    {'pos':['V', 'N', 'N', 'IN'], 'dependency':['conj', 'obj', 'obl', 'case'], 'child':{0:[1,2], 2:[3]}},
-
-
-    
-    {'pos':['V', 'N', 'NOT', 'JJ', 'V', 'TO'], 'dependency':['root', 'nsubj', 'advmod', 'xcomp', 'cop', 'mark'], 'child':{0:[1,2,3], 3:[4], 4:[5]}}, 
-    
     {'pos':['V', 'N', 'JJ', 'V', 'TO'], 'dependency':['root', 'nsubj', 'xcomp', 'cop', 'mark'], 'child':{0:[1,2], 2:[3], 3:[4]}}, 
     
     {'pos':['V', 'NOT', 'JJ', 'V', 'TO'], 'dependency':['conj', 'advmod', 'xcomp', 'cop', 'mark'], 'child':{0:[1,2], 2:[3], 3:[4]}}, 
     
-    {'pos':['V', 'JJ', 'V', 'TO'], 'dependency':['conj', 'xcomp', 'cop', 'mark'], 'child':{0:[1], 1:[2], 2:[3]}}, 
-
-
-    {'pos':['V', 'N', 'NOT', 'N', 'V', 'TO'], 'dependency':['root', 'nsubj', 'advmod', 'xcomp', 'cop', 'mark'], 'child':{0:[1,2,3], 3:[4], 4:[5]}}, 
-    
     {'pos':['V', 'N', 'N', 'V', 'TO'], 'dependency':['root', 'nsubj', 'xcomp', 'cop', 'mark'], 'child':{0:[1,2], 2:[3], 3:[4]}}, 
 
     {'pos':['V', 'NOT', 'N', 'V', 'TO'], 'dependency':['conj', 'advmod', 'xcomp', 'cop', 'mark'], 'child':{0:[1,2], 2:[3], 3:[4]}}, 
+
+    {'pos':['V', 'N', 'NOT', 'V', 'TO'], 'dependency':['root', 'nsubj', 'advmod', 'xcomp', 'mark'], 'child':{0:[1,2,3], 3:[4]}}, 
+
+    {'pos':['V', 'N', 'N', 'IN'], 'dependency':['conj', 'obj', 'obl', 'case'], 'child':{0:[1], 1:[2], 2:[3]}}, 
     
+    {'pos':['V', 'N', 'N', 'N'], 'dependency':['root', 'nsubj', 'iobj', 'obj'], 'child':{0:[1, 2, 3]}}, 
+
+    {'pos':['V', 'NOT', 'N', 'N'], 'dependency':['conj', 'advmod', 'iobj', 'obj'], 'child':{0:[1, 2, 3]}}, 
+    
+    {'pos':['JJ', 'V', 'N', 'TO'], 'dependency':['root', 'xcomp', 'obj', 'mark'], 'child':{0:[1], 1:[2, 3]}}, 
+    
+    {'pos':['JJ', 'N', 'N', 'IN'], 'dependency':['root', 'nsubj', 'obl', 'case'], 'child':{0:[1, 2], 2:[3]}}, 
+
+    {'pos':['JJ', 'NOT', 'N', 'IN'], 'dependency':['conj', 'advmod', 'obl', 'case'], 'child':{0:[1,2], 2:[3]}}, 
+
+    {'pos':['V', 'N', 'V', 'TO'], 'dependency':['root', 'nsubj', 'xcomp', 'mark'], 'child':{0:[1,2], 2:[3]}}, 
+
+    {'pos':['V', 'JJ', 'V', 'TO'], 'dependency':['conj', 'xcomp', 'cop', 'mark'], 'child':{0:[1], 1:[2], 2:[3]}}, 
+
+    {'pos':['V', 'N', 'N', 'IN'], 'dependency':['conj', 'obj', 'obl', 'case'], 'child':{0:[1,2], 2:[3]}},
+
     {'pos':['V', 'N', 'V', 'TO'], 'dependency':['conj', 'xcomp', 'cop', 'mark'], 'child':{0:[1], 1:[2], 2:[3]}}, 
 
-
-
-    {'pos':['V', 'N', 'NOT', 'V', 'N', 'TO'], 'dependency':['root', 'nsubj', 'advmod', 'xcomp', 'obj', 'mark'], 'child':{0:[1,2,3], 3:[4, 5]}}, 
-    
-    {'pos':['V', 'N', 'V', 'N', 'TO'], 'dependency':['root', 'nsubj', 'xcomp', 'obj', 'mark'], 'child':{0:[1,2], 2:[3, 4]}}, 
-
-    {'pos':['V', 'NOT', 'V', 'N', 'TO'], 'dependency':['conj', 'advmod', 'xcomp', 'obj', 'mark'], 'child':{0:[1,2], 2:[3, 4]}}, 
-    
     {'pos':['V', 'V', 'N', 'TO'], 'dependency':['conj', 'xcomp', 'obj', 'mark'], 'child':{0:[1], 1:[2, 3]}}, 
-       
-
       
-    {'pos':['V', 'N', 'NOT', 'N', 'IN'], 'dependency':['root', 'nsubj', 'advmod', 'obl', 'case'], 'child':{0:[1,2,3], 3:[4]}},
-    
     {'pos':['V', 'N', 'N', 'IN'], 'dependency':['root', 'nsubj', 'obl', 'case'], 'child':{0:[1,2], 2:[3]}}, 
+
+    {'pos':['V', 'N', 'N', 'IN'], 'dependency':['root', 'nsubj:pass', 'obl', 'case'], 'child':{0:[1,2], 2:[3]}}, 
 
     {'pos':['V', 'NOT', 'N', 'IN'], 'dependency':['conj', 'advmod', 'obl', 'case'], 'child':{0:[1,2], 2:[3]}}, 
     
-    {'pos':['V', 'N', 'IN'], 'dependency':['conj', 'obl', 'case'], 'child':{0:[1], 1:[2]}}, 
-    
-
-
-    {'pos':['V', 'N', 'NOT', 'N', 'IN'], 'dependency':['root', 'nsubj:pass', 'advmod', 'obl', 'case'], 'child':{0:[1,2,3], 3:[4]}}, 
-    
-    {'pos':['V', 'N', 'N', 'IN'], 'dependency':['root', 'nsubj:pass', 'obl', 'case'], 'child':{0:[1,2], 2:[3]}}, 
-
-    {'pos':['V', 'NOT', 'N'], 'dependency':['conj', 'advmod', 'obj'], 'child':{0:[1,2]}}, 
-    
-    {'pos':['V', 'N'], 'dependency':['conj', 'obj'], 'child':{0:[1]}}, 
-
-    
     {'pos':['V', 'N', 'NOT', 'N'], 'dependency':['root', 'nsubj', 'advmod', 'obj'], 'child':{0:[1,2,3]}}, 
     
-    {'pos':['V', 'N', 'N'], 'dependency':['root', 'nsubj', 'obj'], 'child':{0:[1,2]}}, 
-
     {'pos':['V', 'NOT', 'V', 'TO'], 'dependency':['conj', 'advmod', 'xcomp', 'mark'], 'child':{0:[1,2], 2:[3]}}, 
-    
-    {'pos':['V', 'V', 'TO'], 'dependency':['conj', 'xcomp', 'mark'], 'child':{0:[1], 1:[2]}}, 
-
-
-    
-    {'pos':['V', 'N', 'NOT', 'V', 'TO'], 'dependency':['root', 'nsubj', 'advmod', 'xcomp', 'mark'], 'child':{0:[1,2,3], 3:[4]}}, 
-    
-    {'pos':['V', 'N', 'V', 'TO'], 'dependency':['root', 'nsubj', 'xcomp', 'mark'], 'child':{0:[1,2], 2:[3]}}, 
- 
-    {'pos':['V', 'NOT', 'RP'], 'dependency':['conj', 'advmod', 'compound:prt'], 'child':{0:[1,2]}}, 
-    
-    {'pos':['V', 'RP'], 'dependency':['conj', 'compound:prt'], 'child':{0:[1]}}, 
- 
 
     {'pos':['JJ', 'N', 'NOT', 'V'], 'dependency':['root', 'nsubj', 'advmod', 'cop'], 'child':{0:[1,2,3]}}, 
+    
+    {'pos':['V', 'N', 'NOT', 'JJ'], 'dependency':['root', 'nsubj', 'advmod', 'xcomp'], 'child':{0:[1,2,3]}}, 
+    
+    {'pos':['V', 'N', 'NOT', 'RP'], 'dependency':['root', 'nsubj', 'advmod', 'compound:prt'], 'child':{0:[1,2,3]}}, 
+    
+    {'pos':['JJ', 'N', 'IN'], 'dependency':['conj', 'obl', 'case'], 'child':{0:[1], 1:[2]}}, 
+    
+    {'pos':['V', 'N', 'N'], 'dependency':['conj', 'iobj', 'obj'], 'child':{0:[1, 2]}}, 
+
+    {'pos':['V', 'N', 'RP'], 'dependency':['root', 'nsubj', 'compound:prt'], 'child':{0:[1,2]}}, 
+
+    {'pos':['V', 'N', 'NOT'], 'dependency':['root', 'nsubj', 'advmod'], 'child':{0:[1,2]}}, 
+
+    {'pos':['V', 'N', 'JJ'], 'dependency':['root', 'nsubj', 'xcomp'], 'child':{0:[1,2]}}, 
+
+    {'pos':['V', 'NOT', 'JJ'], 'dependency':['conj', 'advmod', 'xcomp'], 'child':{0:[1,2]}}, 
     
     {'pos':['JJ', 'N', 'V'], 'dependency':['root', 'nsubj', 'cop'], 'child':{0:[1,2]}}, 
 
     {'pos':['JJ', 'NOT', 'V'], 'dependency':['conj', 'advmod', 'cop'], 'child':{0:[1,2]}}, 
     
+    {'pos':['V', 'N', 'IN'], 'dependency':['conj', 'obl', 'case'], 'child':{0:[1], 1:[2]}}, 
+    
+    {'pos':['V', 'NOT', 'N'], 'dependency':['conj', 'advmod', 'obj'], 'child':{0:[1,2]}}, 
+        
+    {'pos':['V', 'N', 'N'], 'dependency':['root', 'nsubj', 'obj'], 'child':{0:[1,2]}}, 
+    
+    {'pos':['V', 'V', 'TO'], 'dependency':['conj', 'xcomp', 'mark'], 'child':{0:[1], 1:[2]}}, 
+
+    {'pos':['V', 'N', 'NOT'], 'dependency':['root', 'nsubj:pass', 'advmod'], 'child':{0:[1,2]}}, 
+
+    {'pos':['V', 'NOT', 'RP'], 'dependency':['conj', 'advmod', 'compound:prt'], 'child':{0:[1,2]}}, 
+    
+    {'pos':['V', 'RP'], 'dependency':['conj', 'compound:prt'], 'child':{0:[1]}}, 
+
     {'pos':['JJ', 'V'], 'dependency':['conj', 'cop'], 'child':{0:[1]}}, 
 
-
- 
-    {'pos':['V', 'N', 'NOT', 'JJ'], 'dependency':['root', 'nsubj', 'advmod', 'xcomp'], 'child':{0:[1,2,3]}}, 
-    
-    {'pos':['V', 'N', 'JJ'], 'dependency':['root', 'nsubj', 'xcomp'], 'child':{0:[1,2]}}, 
-
-    {'pos':['V', 'NOT', 'JJ'], 'dependency':['conj', 'advmod', 'xcomp'], 'child':{0:[1,2]}}, 
-    
     {'pos':['V', 'JJ'], 'dependency':['conj', 'xcomp'], 'child':{0:[1]}}, 
-
-
-    
-    {'pos':['V', 'N', 'NOT', 'RP'], 'dependency':['root', 'nsubj', 'advmod', 'compound:prt'], 'child':{0:[1,2,3]}}, 
-    
-    {'pos':['V', 'N', 'RP'], 'dependency':['root', 'nsubj', 'compound:prt'], 'child':{0:[1,2]}}, 
-
-    {'pos':['V', 'N', 'NOT'], 'dependency':['root', 'nsubj', 'advmod'], 'child':{0:[1,2]}}, 
     
     {'pos':['V', 'N'], 'dependency':['root', 'nsubj'], 'child':{0:[1]}}, 
-    
-    {'pos':['V', 'N', 'NOT'], 'dependency':['root', 'nsubj:pass', 'advmod'], 'child':{0:[1,2]}}, 
     
     {'pos':['V', 'N'], 'dependency':['root', 'nsubj:pass'], 'child':{0:[1]}}, 
     
     {'pos':['V', 'NOT'], 'dependency':['conj', 'advmod'], 'child':{0:[1]}}, 
-    
+
+    {'pos':['V', 'N'], 'dependency':['conj', 'obj'], 'child':{0:[1]}}, 
+
     {'pos':['V'], 'dependency':['conj'], 'child':{0:[]}}, 
 ]
 
