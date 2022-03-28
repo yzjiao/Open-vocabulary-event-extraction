@@ -4,7 +4,7 @@ from time import time
 from datetime import timedelta
 from os.path import join
 from stanfordcorenlp import StanfordCoreNLP
-from extractor1 import Extractor
+from extractor import Extractor
 from nltk import sent_tokenize
 from tqdm import tqdm
 
