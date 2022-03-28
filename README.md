@@ -24,7 +24,7 @@ python mp_extract_event.py
 
 ## Dependencies
 - Python 3.8.5
-- [stanfordcorenlp](https://stanfordnlp.github.io/CoreNLP/) 4.1.0
+- [stanfordcorenlp](https://stanfordnlp.github.io/CoreNLP/) 3.9.2
 - nltk 3.4.5
 - multiprocessing
 - cytoolz 
